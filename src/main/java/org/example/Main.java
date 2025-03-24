@@ -12,15 +12,22 @@ public class Main {
     static void insertSistema(int linha, int coluna){
         sistema = new double[linha][coluna];
         for(int i = 0; i < linha; i++){
-            System.out.println("Insira a " + (i+1) + "º linha");
-            for(int k = 0; k < coluna; k++){
-                sistema[i][k] = sc.nextInt();
+            System.out.println("Linha " + (i+1));
+            for(int j = 0; j < coluna; j++){
+                if(j != coluna - 1){
+                    System.out.printf("X%d - [%d][%d]:", j+1, i+1, j+1);
+                    sistema[i][j] = sc.nextDouble();
+                } else{
+                    System.out.printf("B - [%d][%d]:", i+1, j+1);
+                    sistema[i][j] = sc.nextDouble();
+                }
             }
         }
     }
 
     static void printSistema(int linha, int coluna){
         for(int i = 0; i < linha; i++){
+            System.out.printf("L%d - ", i+1);
             for(int j = 0; j < coluna; j++){
                 double valor = sistema[i][j];
                 if (Math.abs(valor) < 0.0001) {  // Para lidar com -0,0
@@ -28,9 +35,9 @@ public class Main {
                 }
 
                 if (j == coluna - 1) {
-                    System.out.printf("| %.1f", valor);
+                    System.out.printf(Locale.US,"| %.1f", valor);
                 } else {
-                    System.out.printf("%.1f ", valor);
+                    System.out.printf(Locale.US,"%.1fX%d ", valor, j+1);
                 }
             }
             System.out.println();
@@ -95,14 +102,11 @@ public class Main {
 
         resolver();
 
-        System.out.print("Solução: [");
+        System.out.println("Solução:");
         for (int i = 0; i < solucao.length; i++) {
-            System.out.printf(String.format(Locale.US, "%.1f", solucao[i]));
-            if (i < solucao.length - 1) {
-                System.out.print(", ");
-            }
+            System.out.printf(Locale.US, "X%d = %.1f%n",i+1, solucao[i]);
         }
-        System.out.println("]");
+
 
     }
 
