@@ -16,11 +16,10 @@ public class Main {
             for(int j = 0; j < coluna; j++){
                 if(j != coluna - 1){
                     System.out.printf("X%d - [%d][%d]:", j+1, i+1, j+1);
-                    sistema[i][j] = sc.nextDouble();
                 } else{
                     System.out.printf("B - [%d][%d]:", i+1, j+1);
-                    sistema[i][j] = sc.nextDouble();
                 }
+                sistema[i][j] = sc.nextDouble();
             }
         }
     }
@@ -30,6 +29,12 @@ public class Main {
             System.out.printf("L%d - ", i+1);
             for(int j = 0; j < coluna; j++){
                 double valor = sistema[i][j];
+
+                // Substitui valores NaN por 0 na exibição
+                if (Double.isNaN(valor)) {
+                    valor = 0.0;
+                }
+
                 if (Math.abs(valor) < 0.0001) {  // Para lidar com -0,0
                     valor = 0.0;
                 }
@@ -64,24 +69,39 @@ public class Main {
     static void resolver(){
         int n = sistema.length;
 
+        // Verifica SPI e SI antes de resolver
+        for (double[] doubles : sistema) {
+            boolean todosZeros = true;
+            for (int j = 0; j < n; j++) {
+                if (Math.abs(doubles[j]) > 1e-6) {
+                    todosZeros = false;
+                    break;
+                }
+            }
+            if (todosZeros) {
+                if (Math.abs(doubles[n]) > 1e-6) {
+                    System.out.println("O sistema é impossível (SI).");
+                    return;
+                }
+            }
+        }
+
         for(int i = n - 1; i >= 0; i--){
             double calc = sistema[i][n]; // Termo Independente
             for (int j = i + 1; j < n; j++){
                 calc -= sistema[i][j] * solucao[j];
             }
 
-            if (sistema[i][i] == 0) {
-                // Se o valor na diagonal for zero e o termo independente também for zero, temos SPI
-                if (Math.abs(calc) < 1e-6) {
-                    System.out.println("O sistema tem infinitas soluções (SPI).");
-                    return;
-                }
-                // Se o valor na diagonal for zero e o termo independente não for zero, temos SI
-                System.out.println("O sistema é impossível (SI).");
+            if (Math.abs(sistema[i][i]) < 1e-6) {
+                System.out.println("O sistema tem infinitas soluções (SPI).");
                 return;
             }
 
             solucao[i] = calc / sistema[i][i];
+
+            if (Double.isNaN(solucao[i])) {
+                solucao[i] = 0.0;  // Substitui NaN por 0
+            }
 
             if (Math.abs(solucao[i]) < 1e-6) {
                 solucao[i] = 0.0;
