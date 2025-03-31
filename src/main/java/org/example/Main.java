@@ -68,7 +68,6 @@ public class Main {
 
     static void resolver(){
         int n = sistema.length;
-
         // Verifica SPI e SI antes de resolver
         for (double[] doubles : sistema) {
             boolean todosZeros = true;
@@ -102,7 +101,6 @@ public class Main {
             if (Double.isNaN(solucao[i])) {
                 solucao[i] = 0.0;  // Substitui NaN por 0
             }
-
             if (Math.abs(solucao[i]) < 1e-6) {
                 solucao[i] = 0.0;
             }
@@ -124,7 +122,7 @@ public class Main {
 
         System.out.println("Solução:");
         for (int i = 0; i < solucao.length; i++) {
-            System.out.printf(Locale.US, "X%d = %.1f%n",i+1, solucao[i]);
+            System.out.printf(Locale.US, "X%d = %.2f%n",i+1, solucao[i]);
         }
 
 
