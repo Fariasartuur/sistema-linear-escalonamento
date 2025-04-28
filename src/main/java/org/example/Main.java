@@ -30,15 +30,6 @@ public class Main {
             for(int j = 0; j < coluna; j++){
                 double valor = sistema[i][j];
 
-                // Substitui valores NaN por 0 na exibição
-                if (Double.isNaN(valor)) {
-                    valor = 0.0;
-                }
-
-                if (Math.abs(valor) < 0.0001) {  // Para lidar com -0,0
-                    valor = 0.0;
-                }
-
                 if (j == coluna - 1) {
                     System.out.printf(Locale.US,"| %.1f", valor);
                 } else {
@@ -66,46 +57,60 @@ public class Main {
         escalonamento(linhaAtual + 1);
     }
 
-    static void resolver(){
+    static boolean resolver() {
         int n = sistema.length;
-        // Verifica SPI e SI antes de resolver
-        for (double[] doubles : sistema) {
+
+        boolean sistemaImpossivel = false;
+        boolean sistemaIndeterminado = false;
+
+        for (int i = 0; i < n; i++) {
             boolean todosZeros = true;
             for (int j = 0; j < n; j++) {
-                if (Math.abs(doubles[j]) > 1e-6) {
+                if (Math.abs(sistema[i][j]) > 1e-6) {
                     todosZeros = false;
                     break;
                 }
             }
             if (todosZeros) {
-                if (Math.abs(doubles[n]) > 1e-6) {
-                    System.out.println("O sistema é impossível (SI).");
-                    return;
+                if (Math.abs(sistema[i][n]) > 1e-6) {
+                    sistemaImpossivel = true;
+                    break;
+                } else {
+                    sistemaIndeterminado = true;
                 }
             }
         }
 
-        for(int i = n - 1; i >= 0; i--){
-            double calc = sistema[i][n]; // Termo Independente
-            for (int j = i + 1; j < n; j++){
-                calc -= sistema[i][j] * solucao[j];
-            }
-
-            if (Math.abs(sistema[i][i]) < 1e-6) {
-                System.out.println("O sistema tem infinitas soluções (SPI).");
-                return;
-            }
-
-            solucao[i] = calc / sistema[i][i];
-
-            if (Double.isNaN(solucao[i])) {
-                solucao[i] = 0.0;  // Substitui NaN por 0
-            }
-            if (Math.abs(solucao[i]) < 1e-6) {
-                solucao[i] = 0.0;
-            }
+        if (sistemaImpossivel) {
+            System.out.println("O sistema é impossível (SI).");
+            return false;
         }
+
+        if (sistemaIndeterminado) {
+            System.out.println("O sistema possui infinitas soluções (SPI).");
+            return false;
+        }
+
+        // Substituição regressiva
+        for (int i = n - 1; i >= 0; i--) {
+            double soma = sistema[i][n];
+            for (int j = i + 1; j < n; j++) {
+                soma -= sistema[i][j] * solucao[j];
+            }
+
+            double pivo = sistema[i][i];
+            if (Math.abs(pivo) < 1e-6) {
+                System.out.println("O sistema possui infinitas soluções (SPI).");
+                return false;
+            }
+
+            solucao[i] = soma / pivo;
+        }
+
+        return true; // Resolvemos com sucesso
     }
+
+
 
     static void solucionar(int linha, int coluna){
         solucao = new double[linha];
@@ -118,15 +123,14 @@ public class Main {
         System.out.println("Depois do Escalonamento");
         printSistema(linha, coluna);
 
-        resolver();
-
-        System.out.println("Solução:");
-        for (int i = 0; i < solucao.length; i++) {
-            System.out.printf(Locale.US, "X%d = %.2f%n",i+1, solucao[i]);
+        if (resolver()) {
+            System.out.println("Solução:");
+            for (int i = 0; i < solucao.length; i++) {
+                System.out.printf(Locale.US, "X%d = %.2f%n", i+1, solucao[i]);
+            }
         }
-
-
     }
+
 
     public static void main(String[] args) {
 
@@ -195,5 +199,7 @@ public class Main {
             default:
                 System.out.println("Opção Incorreta.");
         }
+
+        sc.close();
     }
 }
